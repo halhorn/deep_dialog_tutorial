@@ -50,10 +50,7 @@ class Transformer(tf.keras.models.Model):
 
     def build_graph(self, name='transformer') -> None:
         '''
-        モデルを構築します。
-
-        :param scope: モデルの重みのスコープ
-        :param reuse: 重みを共有する場合 True
+        学習/推論のためのグラフを構築します。
         '''
         with tf.name_scope(name):
             self.is_training = tf.placeholder(dtype=tf.bool, name='is_training')
