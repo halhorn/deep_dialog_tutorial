@@ -2,6 +2,9 @@ import tensorflow as tf
 
 
 class FeedForwardNetwork(tf.keras.models.Model):
+    '''
+    Transformer 用の Position-wise Feedforward Neural Network です。
+    '''
     def __init__(self, hidden_dim: int, dropout_rate: float, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.hidden_dim = hidden_dim
@@ -24,6 +27,12 @@ class FeedForwardNetwork(tf.keras.models.Model):
 
 
 class ResidualNormalizationWrapper(tf.keras.models.Model):
+    '''
+    与えられたレイヤー（もしくはモデル）に対して、下記のノーマライゼーションを行います。
+    - Layer Normalization
+    - Dropout
+    - Residual Connection
+    '''
     def __init__(self, layer: tf.keras.layers.Layer, dropout_rate: float, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.layer = layer
@@ -38,6 +47,10 @@ class ResidualNormalizationWrapper(tf.keras.models.Model):
 
 
 class LayerNormalization(tf.keras.layers.Layer):
+    '''
+    レイヤーノーマライゼーションです。
+    レイヤーの出力が平均 bias, 標準偏差 scale になるように調整します。
+    '''
     def build(self, input_shape: tf.TensorShape) -> None:
         hidden_dim = input_shape[-1]
         self.scale = self.add_weight('layer_norm_scale', shape=[hidden_dim],

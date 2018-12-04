@@ -105,6 +105,9 @@ class MultiheadAttention(tf.keras.models.Model):
 
 
 class SelfAttention(MultiheadAttention):
+    '''
+    Multi-head Attention による自己注意です。
+    '''
     def call(  # type: ignore
             self,
             input: tf.Tensor,
@@ -121,7 +124,7 @@ class SelfAttention(MultiheadAttention):
 
 class SimpleAttention(tf.keras.models.Model):
     '''
-    Attention の説明をするための、 Multi-head ではない単純な Attention です
+    Attention の説明をするための、 Multi-head ではない単純な Attention です。
     '''
 
     def __init__(self, depth: int, *args, **kwargs):

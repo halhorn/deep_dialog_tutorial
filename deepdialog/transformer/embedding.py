@@ -5,6 +5,9 @@ PAD_ID = 0
 
 
 class TokenEmbedding(tf.keras.layers.Layer):
+    '''
+    トークン列を Embedded Vector 列に変換します。
+    '''
     def __init__(self, vocab_size: int, embedding_dim: int, dtype=tf.float32, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.vocab_size = vocab_size

@@ -8,6 +8,9 @@ PAD_ID = 0
 
 
 class Transformer(tf.keras.models.Model):
+    '''
+    Transformer モデルです。
+    '''
     def __init__(
             self,
             vocab_size: int,
@@ -83,6 +86,9 @@ class Transformer(tf.keras.models.Model):
 
 
 class Encoder(tf.keras.models.Model):
+    '''
+    トークン列をベクトル列にエンコードする Encoder です。
+    '''
     def __init__(
             self,
             vocab_size: int,
@@ -141,6 +147,9 @@ class Encoder(tf.keras.models.Model):
 
 
 class Decoder(tf.keras.models.Model):
+    '''
+    エンコードされたベクトル列からトークン列を生成する Decoder です。
+    '''
     def __init__(
             self,
             vocab_size: int,
