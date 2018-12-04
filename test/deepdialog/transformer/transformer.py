@@ -1,5 +1,6 @@
 import unittest
 import tensorflow as tf
+import numpy as np
 from deepdialog.transformer.transformer import (
     Transformer, Encoder, Decoder, PAD_ID
 )
@@ -8,6 +9,24 @@ tf.enable_eager_execution()
 
 
 class TestTransformer(unittest.TestCase):
+    def test_build_graph(self):
+        vocab_size = 17
+        max_length = 13
+        hidden_dim = 32
+        with tf.Graph().as_default(), tf.Session() as sess:
+            model = Transformer(vocab_size, hopping_num=3, head_num=4, hidden_dim=hidden_dim,
+                                dropout_rate=0.1, max_length=max_length)
+            model.build_graph()
+            sess.run(tf.global_variables_initializer())
+            loss, acc, prediction = sess.run([model.loss, model.acc, model.prediction], feed_dict={
+                model.is_training: True,
+                model.encoder_input: np.array([[10, 11, 12], [13, 14, 15]]),
+                model.decoder_input: np.array([[1, 20, 21, 2], [1, 22, 23, 2]]),
+            })
+            self.assertIsInstance(loss, np.float32)
+            self.assertIsInstance(acc, np.float32)
+            self.assertEqual(prediction.shape, (2, 3, vocab_size))  # 3 == decoder_len - 1
+
     def test_call(self):
         vocab_size = 17
         batch_size = 7

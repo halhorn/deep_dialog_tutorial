@@ -3,6 +3,7 @@ from typing import List, Tuple
 from .common_layer import FeedForwardNetwork, ResidualNormalizationWrapper, LayerNormalization
 from .embedding import TokenEmbedding, AddPositionalEncoding
 from .attention import MultiheadAttention, SelfAttention
+from .metrics import padded_cross_entropy_loss, padded_accuracy
 
 PAD_ID = 0
 
@@ -18,7 +19,7 @@ class Transformer(tf.keras.models.Model):
             head_num: int = 8,
             hidden_dim: int = 512,
             dropout_rate: float = 0.1,
-            max_length: int = 200,
+            max_length: int = 50,
             *args,
             **kwargs,
     ) -> None:
@@ -46,6 +47,37 @@ class Transformer(tf.keras.models.Model):
             dropout_rate=dropout_rate,
             max_length=max_length,
         )
+
+    def build_graph(self, name='transformer') -> None:
+        '''
+        モデルを構築します。
+
+        :param scope: モデルの重みのスコープ
+        :param reuse: 重みを共有する場合 True
+        '''
+        with tf.name_scope(name):
+            self.is_training = tf.placeholder(dtype=tf.bool, name='is_training')
+            # [batch_size, max_length]
+            self.encoder_input = tf.placeholder(dtype=tf.int32, shape=[None, None], name='encoder_input')
+            # [batch_size]
+            self.decoder_input = tf.placeholder(dtype=tf.int32, shape=[None, None], name='decoder_input')
+
+            logit = self.call(
+                encoder_input=self.encoder_input,
+                decoder_input=self.decoder_input[:, :-1],  # 入力は EOS を含めない
+                training=self.is_training,
+            )
+            decoder_target = self.decoder_input[:, 1:]  # 出力は BOS を含めない
+
+            self.prediction = tf.nn.softmax(logit, name='prediction')
+
+            with tf.name_scope('metrics'):
+                xentropy, weights = padded_cross_entropy_loss(
+                    logit, decoder_target, smoothing=0.05, vocab_size=self.vocab_size)
+                self.loss = tf.identity(tf.reduce_sum(xentropy) / tf.reduce_sum(weights), name='loss')
+
+                accuracies, weights = padded_accuracy(logit, decoder_target)
+                self.acc = tf.identity(tf.reduce_sum(accuracies) / tf.reduce_sum(weights), name='acc')
 
     def call(self, encoder_input: tf.Tensor, decoder_input: tf.Tensor, training: bool) -> tf.Tensor:
         enc_attention_mask = self._create_enc_attention_mask(encoder_input)

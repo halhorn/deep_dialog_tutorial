@@ -15,6 +15,7 @@ tqdm = "*"
 ipython = "*"
 "flake8" = "*"
 mypy = "*"
+sentencepiece = "*"
 
 [dev-packages]
 
