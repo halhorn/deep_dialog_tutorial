@@ -1,0 +1,21 @@
+#/bin/sh
+
+if [ $# -eq 1 ];then
+    echo '# flake8 ################################'
+    pipenv run flake8 $1
+    echo ''
+    echo '# mypy ################################'
+    pipenv run mypy $1
+    echo ''
+    echo '# test ##################################'
+    pipenv run test $1
+else
+    echo '# flake8 ################################'
+    pipenv run flake8 ./
+    echo ''
+    echo '# mypy ################################'
+    pipenv run mypy ./
+    echo ''
+    echo '# test ##################################'
+    pipenv run  test
+fi
