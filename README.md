@@ -7,10 +7,11 @@ python は python3 を想定してます。
 ```zsh
 git clone git@github.com:halhorn/deep_dialog_tutorial.git
 cd deep_dialog_tutorial
-pip install -r requirements.txt
+pip install pipenv
+pipenv install
 
 # 起動
-jupyter notebook
+pipenv run jupyter lab
 ```
 
 # RNNLM
