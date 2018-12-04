@@ -30,3 +30,10 @@ RNN の言語モデル。
 - 学習時：上から順に Train のセクションまで実行してください
 - 生成時：Train 以外のそれより上と、 Restore, Generate を実行してください。
     - Restore 時のモデルのパスは適宜変えてください。
+
+# Testing
+```py3
+./test/run
+# or
+./test/run deepdialog/transformer/transformer.py
+```
