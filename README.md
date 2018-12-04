@@ -1,7 +1,10 @@
 # Deep Dialog Tutorial
-会話モデルを試して見るための簡単なチュートリアルを作ろうと思ったけど RNNLM 作って力尽きたやつ。
+会話モデルネタでいろいろ追加していくリポジトリ
 
-# Setup
+- [Transformer](https://github.com/halhorn/deep_dialog_tutorial/tree/master/deepdialog/transformer)
+- [RNNLM](https://github.com/halhorn/deep_dialog_tutorial/tree/master/deepdialog/rnnlm)
+
+# Install
 python は python3 を想定してます。
 
 ```zsh
@@ -13,6 +16,10 @@ pipenv install
 # 起動
 pipenv run jupyter lab
 ```
+
+# Transformer
+[コード](https://github.com/halhorn/deep_dialog_tutorial/tree/master/deepdialog/transformer)
+[作って理解する Transformer / Attention](https://qiita.com/halhorn/private/c91497522be27bde17ce)
 
 # RNNLM
 rnnlm.ipynb
