@@ -21,6 +21,10 @@ class BatchGenerator:
         self.eos = self.sp.piece_to_id('</s>')
         self.pad = 0
 
+    @property
+    def vocab_size(self) -> int:
+        return self.sp.get_piece_size()
+
     def load(self, file_path: str) -> None:
         with open(file_path) as f:
             lines = [line.strip() for line in f.readlines()]

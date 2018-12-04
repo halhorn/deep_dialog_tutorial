@@ -3,6 +3,10 @@ from deepdialog.transformer.preprocess.batch_generator import BatchGenerator, EN
 
 
 class TestBatchGenerator(unittest.TestCase):
+    def test_vocab_size(self):
+        batch_generator = BatchGenerator()
+        self.assertEqual(batch_generator.vocab_size, 8000)
+
     def test_get_batch(self):
         batch_generator = BatchGenerator()
         batch_generator.data = [
