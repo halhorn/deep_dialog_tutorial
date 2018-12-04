@@ -19,7 +19,7 @@ class Transformer(tf.keras.models.Model):
             head_num: int = 8,
             hidden_dim: int = 512,
             dropout_rate: float = 0.1,
-            max_length: int = 200,
+            max_length: int = 50,
             *args,
             **kwargs,
     ) -> None:
