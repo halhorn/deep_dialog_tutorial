@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[scripts]
+test = "python -m test.run"
+lint = "flake8"
+mypy = "mypy --ignore-missing"
+
+[packages]
+jupyterlab = "*"
+tensorflow-gpu = "==1.12.0"
+tqdm = "*"
+ipython = "*"
+"flake8" = "*"
+mypy = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
