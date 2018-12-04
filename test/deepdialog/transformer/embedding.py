@@ -2,7 +2,7 @@ import unittest
 import tensorflow as tf
 import numpy as np
 import itertools
-from tfsample.transformer.embedding import TokenEmbedding, AddPositionalEncoding
+from deepdialog.transformer.embedding import TokenEmbedding, AddPositionalEncoding
 
 tf.enable_eager_execution()
 

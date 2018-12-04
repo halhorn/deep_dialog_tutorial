@@ -1,7 +1,7 @@
 import unittest
 import tensorflow as tf
 import numpy as np
-from tfsample.transformer.attention import MultiheadAttention, SelfAttention, SimpleAttention
+from deepdialog.transformer.attention import MultiheadAttention, SelfAttention, SimpleAttention
 
 tf.enable_eager_execution()
 
