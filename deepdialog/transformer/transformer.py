@@ -71,12 +71,13 @@ class Transformer(tf.keras.models.Model):
 
             self.prediction = tf.nn.softmax(logit, name='prediction')
 
-            xentropy, weights = padded_cross_entropy_loss(
-                logit, decoder_target, smoothing=0.05, vocab_size=self.vocab_size)
-            self.loss = tf.identity(tf.reduce_sum(xentropy) / tf.reduce_sum(weights), name='loss')
+            with tf.name_scope('metrics'):
+                xentropy, weights = padded_cross_entropy_loss(
+                    logit, decoder_target, smoothing=0.05, vocab_size=self.vocab_size)
+                self.loss = tf.identity(tf.reduce_sum(xentropy) / tf.reduce_sum(weights), name='loss')
 
-            accuracies, weights = padded_accuracy(logit, decoder_target)
-            self.acc = tf.identity(tf.reduce_sum(accuracies) / tf.reduce_sum(weights), name='acc')
+                accuracies, weights = padded_accuracy(logit, decoder_target)
+                self.acc = tf.identity(tf.reduce_sum(accuracies) / tf.reduce_sum(weights), name='acc')
 
     def call(self, encoder_input: tf.Tensor, decoder_input: tf.Tensor, training: bool) -> tf.Tensor:
         enc_attention_mask = self._create_enc_attention_mask(encoder_input)
