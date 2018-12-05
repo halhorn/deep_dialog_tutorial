@@ -27,6 +27,11 @@ class TestTransformer(unittest.TestCase):
             self.assertIsInstance(acc, np.float32)
             self.assertEqual(prediction.shape, (2, 3, vocab_size))  # 3 == decoder_len - 1
 
+            # Graph がグローバルに持っている重みと、モデルがプロパティとして持っている重みが一致することのテスト
+            graph_weight_set = set(tf.trainable_variables())
+            model_weight_set = set(model.weights)
+            self.assertEqual(model_weight_set, graph_weight_set)
+
     def test_call(self):
         vocab_size = 17
         batch_size = 7

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from typing import List, Tuple
+from typing import List
 from .common_layer import FeedForwardNetwork, ResidualNormalizationWrapper, LayerNormalization
 from .embedding import TokenEmbedding, AddPositionalEncoding
 from .attention import MultiheadAttention, SelfAttention
@@ -139,14 +139,14 @@ class Encoder(tf.keras.models.Model):
         self.add_position_embedding = AddPositionalEncoding()
         self.input_dropout_layer = tf.keras.layers.Dropout(dropout_rate)
 
-        self.attention_block_list: List[Tuple[tf.keras.models.Model, tf.keras.models.Model]] = []
+        self.attention_block_list: List[List[tf.keras.models.Model]] = []
         for _ in range(hopping_num):
-            attention_layer = SelfAttention(hidden_dim, head_num, dropout_rate)
-            ffn_layer = FeedForwardNetwork(hidden_dim, dropout_rate)
-            self.attention_block_list.append((
-                ResidualNormalizationWrapper(attention_layer, dropout_rate),
-                ResidualNormalizationWrapper(ffn_layer, dropout_rate),
-            ))
+            attention_layer = SelfAttention(hidden_dim, head_num, dropout_rate, name='self_attention')
+            ffn_layer = FeedForwardNetwork(hidden_dim, dropout_rate, name='ffn')
+            self.attention_block_list.append([
+                ResidualNormalizationWrapper(attention_layer, dropout_rate, name='self_attention_wrapper'),
+                ResidualNormalizationWrapper(ffn_layer, dropout_rate, name='ffn_wrapper'),
+            ])
         self.output_normalization = LayerNormalization()
 
     def call(
@@ -167,7 +167,8 @@ class Encoder(tf.keras.models.Model):
         embedded_input = self.add_position_embedding(embedded_input)
         query = self.input_dropout_layer(embedded_input, training=training)
 
-        for i, (attention_layer, ffn_layer) in enumerate(self.attention_block_list):
+        for i, layers in enumerate(self.attention_block_list):
+            attention_layer, ffn_layer = tuple(layers)
             with tf.name_scope(f'hopping_{i}'):
                 query = attention_layer(query, attention_mask=self_attention_mask, training=training)
                 query = ffn_layer(query, training=training)
@@ -200,16 +201,16 @@ class Decoder(tf.keras.models.Model):
         self.add_position_embedding = AddPositionalEncoding()
         self.input_dropout_layer = tf.keras.layers.Dropout(dropout_rate)
 
-        self.attention_block_list: List[Tuple[tf.keras.models.Model, tf.keras.models.Model, tf.keras.models.Model]] = []
+        self.attention_block_list: List[List[tf.keras.models.Model]] = []
         for _ in range(hopping_num):
-            self_attention_layer = SelfAttention(hidden_dim, head_num, dropout_rate)
-            enc_dec_attention_layer = MultiheadAttention(hidden_dim, head_num, dropout_rate)
-            ffn_layer = FeedForwardNetwork(hidden_dim, dropout_rate)
-            self.attention_block_list.append((
-                ResidualNormalizationWrapper(self_attention_layer, dropout_rate),
-                ResidualNormalizationWrapper(enc_dec_attention_layer, dropout_rate),
-                ResidualNormalizationWrapper(ffn_layer, dropout_rate),
-            ))
+            self_attention_layer = SelfAttention(hidden_dim, head_num, dropout_rate, name='self_attention')
+            enc_dec_attention_layer = MultiheadAttention(hidden_dim, head_num, dropout_rate, name='enc_dec_attention')
+            ffn_layer = FeedForwardNetwork(hidden_dim, dropout_rate, name='ffn')
+            self.attention_block_list.append([
+                ResidualNormalizationWrapper(self_attention_layer, dropout_rate, name='self_attention_wrapper'),
+                ResidualNormalizationWrapper(enc_dec_attention_layer, dropout_rate, name='enc_dec_attention_wrapper'),
+                ResidualNormalizationWrapper(ffn_layer, dropout_rate, name='ffn_wrapper'),
+            ])
         self.output_normalization = LayerNormalization()
         # 注：本家ではここは TokenEmbedding の重みを転地したものを使っている
         self.output_dense_layer = tf.keras.layers.Dense(vocab_size, use_bias=False)
@@ -234,7 +235,8 @@ class Decoder(tf.keras.models.Model):
         embedded_input = self.add_position_embedding(embedded_input)
         query = self.input_dropout_layer(embedded_input, training=training)
 
-        for i, (self_attention_layer, enc_dec_attention_layer, ffn_layer) in enumerate(self.attention_block_list):
+        for i, layers in enumerate(self.attention_block_list):
+            self_attention_layer, enc_dec_attention_layer, ffn_layer = tuple(layers)
             with tf.name_scope(f'hopping_{i}'):
                 query = self_attention_layer(query, attention_mask=self_attention_mask, training=training)
                 query = enc_dec_attention_layer(query, memory=encoder_output,
